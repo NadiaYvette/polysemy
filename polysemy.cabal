@@ -96,13 +96,15 @@ library
       TypeOperators
       TypeFamilies
       UnicodeSyntax
-  ghc-options: -Wall
+  ghc-options: -Wall -fplugin=Polytropos.Plugin
   build-depends:
       async >=2.2 && <3
     , base >=4.9 && <5
     , containers >=0.5 && <1.0
     , first-class-families >=0.5.0.0 && <0.9
     , mtl >=2.2.2 && <3
+    , polytropos-core
+    , polytropos-plugin
     , stm ==2.*
     , syb ==0.7.*
     , template-haskell >=2.12.0.0 && <3
@@ -162,7 +164,7 @@ test-suite polysemy-test
       TypeOperators
       TypeFamilies
       UnicodeSyntax
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -fplugin=Polytropos.Plugin
   build-depends:
       async >=2.2 && <3
     , base >=4.9 && <5
@@ -174,6 +176,8 @@ test-suite polysemy-test
     , inspection-testing >=0.4.2 && <0.7
     , mtl >=2.2.2 && <3
     , polysemy
+    , polytropos-core
+    , polytropos-plugin
     , stm ==2.*
     , syb ==0.7.*
     , template-haskell >=2.12.0.0 && <3

@@ -1,6 +1,12 @@
-packages: . polysemy-plugin
+packages:
+  .
+  /home/nyc/src/polytropos/packages/polytropos-core/*.cabal
+  /home/nyc/src/polytropos/packages/polytropos-plugin/*.cabal
 
 jobs: $ncpus
 
+allow-newer: *
+
 package *
   ghc-options: +RTS -A128m -n2m -RTS
+

@@ -56,6 +56,7 @@ import Data.Typeable
 import Polysemy.Internal.Kind
 import {-# SOURCE #-} Polysemy.Internal
 import Polysemy.Internal.Sing (SList (SEnd, SCons))
+import Polytropos.Core (ConstructorIndex (..))
 import Unsafe.Coerce (unsafeCoerce)
 
 
@@ -182,14 +183,10 @@ sameMember :: forall e e' r
             . ElemOf e r
            -> ElemOf e' r
            -> Maybe (e :~: e')
-sameMember Here       Here =
-  Just Refl
-sameMember (There pr) (There pr') =
-  sameMember @e @e' pr pr'
-sameMember (There _)  _ =
-  Nothing
-sameMember _          _ =
-  Nothing
+sameMember (UnsafeMkElemOf t1) (UnsafeMkElemOf t2)
+  | t1 == t2  = Just (unsafeCoerce Refl)
+  | otherwise = Nothing
+{-# INLINE sameMember #-}
 
 
 ------------------------------------------------------------------------------
@@ -201,6 +198,9 @@ class Member (t :: Effect) (r :: EffectRow) where
 
 instance {-# OVERLAPPING #-} Member t (t ': z) where
   membership' = Here
+
+instance {-# OVERLAPPABLE #-} ConstructorIndex t r => Member t r where
+  membership' = UnsafeMkElemOf (fromIntegral (constructorIndex @_ @t @r))
 
 instance Member t z => Member t (_1 ': z) where
   membership' = There $ membership' @t @z
@@ -278,36 +278,29 @@ injectMembership (SCons sl) sm (There pr) = There (injectMembership @right sl sm
 -- | Decompose a 'Union'. Either this union contains an effect @e@---the head
 -- of the @r@ list---or it doesn't.
 decomp :: Union (e ': r) m a -> Either (Union r m a) (Weaving e m a)
-decomp (Union p a) =
-  case p of
-    Here  -> Right a
-    There pr -> Left $ Union pr a
-{-# INLINABLE decomp #-}
+decomp (Union (UnsafeMkElemOf 0) a) = Right (unsafeCoerce a)
+decomp (Union (UnsafeMkElemOf n) a) = Left (Union (UnsafeMkElemOf (n - 1)) a)
+{-# INLINE decomp #-}
 
 ------------------------------------------------------------------------------
 -- | Retrieve the last effect in a 'Union'.
 extract :: Union '[e] m a -> Weaving e m a
-extract (Union Here a)   = a
-extract (Union (There _) _) = error "Unsafe use of UnsafeMkElemOf"
-{-# INLINABLE extract #-}
+extract (Union _ a) = unsafeCoerce a
+{-# INLINE extract #-}
 
 
 ------------------------------------------------------------------------------
 -- | An empty union contains nothing, so this function is uncallable.
 absurdU :: Union '[] m a -> b
-#if __GLASGOW_HASKELL__ >= 902
-absurdU = \case
-#else
-absurdU _ = error "Unsafe use of UnsafeMkElemOf"
-#endif
+absurdU (Union _ _) = error "absurdU: empty Union"
 
 
 ------------------------------------------------------------------------------
 -- | Weaken a 'Union' so it is capable of storing a new sort of effect at the
 -- head.
 weaken :: forall e r m a. Union r m a -> Union (e ': r) m a
-weaken (Union pr a) = Union (There pr) a
-{-# INLINABLE weaken #-}
+weaken (Union (UnsafeMkElemOf n) a) = Union (UnsafeMkElemOf (n + 1)) a
+{-# INLINE weaken #-}
 
 
 ------------------------------------------------------------------------------
@@ -388,8 +381,6 @@ prjUsing pr (Union sn a) = (\Refl -> a) <$> sameMember pr sn
 decompCoerce
     :: Union (e ': r) m a
     -> Either (Union (f ': r) m a) (Weaving e m a)
-decompCoerce (Union p a) =
-  case p of
-    Here  -> Right a
-    There pr -> Left (Union (There pr) a)
-{-# INLINABLE decompCoerce #-}
+decompCoerce (Union (UnsafeMkElemOf 0) a) = Right (unsafeCoerce a)
+decompCoerce (Union (UnsafeMkElemOf n) a) = Left (Union (UnsafeMkElemOf n) a)
+{-# INLINE decompCoerce #-}
