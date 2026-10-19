@@ -29,6 +29,10 @@ dependencies:
 - unagi-chan >= 0.4.0.0 && < 0.5
 - async >= 2.2 && < 3
 - type-errors >= 0.2.0.0
+- polytropos-core
+- polytropos-plugin
+- polytropos-reader-soup
+- primitive >= 0.7 && < 1
 
 custom-setup:
   dependencies:
@@ -59,7 +63,9 @@ when:
       - TypeInType
 
 library:
-  ghc-options: -Wall
+  ghc-options:
+  - -Wall
+  - -fplugin=Polytropos.Plugin
   source-dirs: src
   other-modules: Polysemy.Internal.PluginLookup
   generated-other-modules:
@@ -78,6 +84,9 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -fplugin=Polytropos.Plugin
+    build-tools:
+    - hspec-discover:hspec-discover >= 2.0
     dependencies:
     - polysemy
     - inspection-testing >= 0.4.2 && < 0.7

@@ -1,6 +1,6 @@
 cabal-version: 2.0
 
--- This file has been generated from package.yaml by hpack version 0.36.1.
+-- This file has been generated from package.yaml by hpack version 0.38.3.
 --
 -- see: https://github.com/sol/hpack
 
@@ -63,11 +63,13 @@ library
       Polysemy.Internal.Union
       Polysemy.Internal.Writer
       Polysemy.IO
+      Polysemy.Labeled
       Polysemy.Membership
       Polysemy.NonDet
       Polysemy.Opaque
       Polysemy.Output
       Polysemy.Reader
+      Polysemy.ReaderSoup
       Polysemy.Resource
       Polysemy.Scoped
       Polysemy.State
@@ -105,6 +107,8 @@ library
     , mtl >=2.2.2 && <3
     , polytropos-core
     , polytropos-plugin
+    , polytropos-reader-soup
+    , primitive >=0.7 && <1
     , stm ==2.*
     , syb ==0.7.*
     , template-haskell >=2.12.0.0 && <3
@@ -137,6 +141,7 @@ test-suite polysemy-test
       InterceptSpec
       KnownRowSpec
       OutputSpec
+      ReaderSoupSpec
       ScopedSpec
       TacticsSpec
       ThEffectSpec
@@ -165,6 +170,8 @@ test-suite polysemy-test
       TypeFamilies
       UnicodeSyntax
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -fplugin=Polytropos.Plugin
+  build-tool-depends:
+      hspec-discover:hspec-discover >=2.0
   build-depends:
       async >=2.2 && <3
     , base >=4.9 && <5
@@ -178,6 +185,8 @@ test-suite polysemy-test
     , polysemy
     , polytropos-core
     , polytropos-plugin
+    , polytropos-reader-soup
+    , primitive >=0.7 && <1
     , stm ==2.*
     , syb ==0.7.*
     , template-haskell >=2.12.0.0 && <3
