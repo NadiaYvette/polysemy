@@ -105,9 +105,9 @@ library
     , containers >=0.5 && <1.0
     , first-class-families >=0.5.0.0 && <0.9
     , mtl >=2.2.2 && <3
-    , polytropos-core
-    , polytropos-plugin
-    , polytropos-reader-soup
+    , polytropos-core >=0.1.0.1
+    , polytropos-plugin >=0.1.0.1
+    , polytropos-reader-soup >=0.1.0.1
     , primitive >=0.7 && <1
     , stm ==2.*
     , syb ==0.7.*
